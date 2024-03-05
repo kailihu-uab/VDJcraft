@@ -1,6 +1,3 @@
-# VDJcraft
- comprehensively characterze immune repertoire
-
 # V(D)Jcraft
 
 A V(D)J identifer for long-read transcriptome data.
