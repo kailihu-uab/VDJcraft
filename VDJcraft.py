@@ -5,7 +5,7 @@ from Bio import SeqIO
 import sys
 import shutil
 import pandas as pd
-import script
+import blast_format
 import dscript
 import high_confident
 import D_extract
