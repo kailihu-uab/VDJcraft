@@ -3,8 +3,7 @@ import pandas as pd
 import io
 from Bio import SeqIO
 from Bio.Seq import Seq
-#from fuzzywuzzy import fuzz
-#from fuzzywuzzy import process
+
 
 
 
