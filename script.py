@@ -2,19 +2,10 @@
 import re
 import os
 
-#parser = argparse.ArgumentParser()
-#parser.add_argument('-o', '--output', type=str, default='output.txt', help="Output file path")
-#args = parser.parse_args()
 
-#output_file = args.output
 
 def blastfmt(f,f1):
-#  output_filename = "raw_vdj.txt"
-#  if os.path.exists(output_filename):
-#    os.remove(output_filename)
   with open(f1, 'w') as g:
-#    if os.path.exists(raw_vdj.txt):
-#       os.remove(raw_vdj.txt)
     out0=('Query'+'\t'+'Gene'+'\t'+'Length'+'\t'+'Score'+'\t'+'Expect'+'\t'+'Identities'+'\t'+'Iden_percentage'+'\t'+'Gaps'+'\t'+'Gap_percentage'+'\t'+'Strand'+'\t'+'querystart'+'\t'+'queryend'+'\t'+'queryseq'+'\t'+'subjectstart'+'\t'+'subjectend'+'\t'+'subjectseq'+'\n')
     g.write(out0)
     sname = qseq = sseq = ""
