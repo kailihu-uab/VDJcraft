@@ -109,10 +109,3 @@ def blastfmt(f,f1):
           g.write(out3+'\n')
     g.close()
 
-
-#    g.seek(0)
-#    lines = g.read()
-        # return(line.strip())
-#    return lines
-    #with open("output.txt", 'r') as g:
-     #     return g.read()
