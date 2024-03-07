@@ -3,8 +3,7 @@ import pandas as pd
 import io
 from Bio import SeqIO
 from Bio.Seq import Seq
-#from fuzzywuzzy import fuzz
-#from fuzzywuzzy import process
+
 
 def extract_cdr1_sequence(df):
     result = []
@@ -118,10 +117,4 @@ def cdr2_extract(df, column1, column2, column3,column4,column5,column6):
             dfcdr2 = pd.DataFrame(cdr2rows)
     return dfcdr2
 
-   #  If no match was found, return None
- #   return None
-#mergecdr2 = pd.merge(dfv, df2, on = 'v_gene')
-#cdr2 = cdr12match_and_extract(mergecdr2, "v_seq", "cdr2", "v_gene")
-#print(cdr2)
-    #*mergecdr2 = pd.merge(merge_vdjc, df2, on = 'v_gene')
-    #*mergecdr2['v_gene'] = mergecdr2['v_gene'].str.replace(r'_.*', '', regex=True)
+
