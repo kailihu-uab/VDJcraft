@@ -125,4 +125,44 @@ VDJcraft -I vdjcraft/testdata/test.fastq  -R vdjcraft/testdata/IMGT.fa -o test_o
 ```
 
 
+### Options of VDJcraft
+#### 1. --minsupp, minimal number of supporting reads
+--min_supp is the most important argument for gene fusion candidate filtering of FusionSeeker. It is used to remove false-positive signals generated during sequencing or read alignment processes.
+By default, FusionSeeker estimates the volumn of noise signals from input dataset to assign a resonable --minsupp. If you find number of gene fusions is too few under default settings, you can speficy a lower --minsupp cutoff to allow in more candidates:
+```
+vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/ --minsupp 5
+```
+It is not suggested to set a --minsupp below 3, unless the sequencing depth of input dataset is extremely low.
+
+#### 2. --maxdistance, maxminal distance cutoff in density-based spatial clustering of applications with noise
+This option adjusts max distance cutoff used for clustering gene fusion raw signals. By default, FusionSeeker sets 20 for highly accurate reads (IsoSeq) and 40 for noisy reads (Nanopore).
+you can set a larger value of --maxdistance to tolerate more shifts in the breakpoint positions of raw signals:
+
+```
+vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/ --maxdistance 100
+```
+
+#### 3. --ref, reference genome
+Input reference genome allows FusionSeeker to align transcript sequences and refine breakpoint positions of confident gene fusion calls. Make sure to provide the same reference file used for read alignment.
+By default, FusionSeeker does NOT refine breakpoint positions when no reference genome is provided.
+(minimap2(>=2.24) is required to map transcript sequences to the reference.)
+```
+vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/  --ref reference.fa
+```
+
+
+## Output files
+The output directory includes:
+```
+vdjc_original.txt                       A list of confident VDJ genes calls from input fastq file. Includes gene names, gene sequences, name of VDJC-supporting reads.
+vdjc_corrected.fa                       Reported confident VDJC gene calls after error correction.
+cdr1.csv                                A full list of detected CDR1 identification and sequences, includes read name, related V genes, CDR1 sequences.
+cdr2.csv                                A full list of detected CDR2 identification and sequences, includes read name, related V genes, CDR2 sequences.
+cdr3.csv                                A full list of detected CDR3 identification and sequences, includes read name, related V genes, CDR3 sequences.
+blastout.txt                            Results of candidate reads aligned with IMGT database.
+rawsignal.txt                                  A list of all gene fusion raw signals.
+log.txt                                        Log file for debug.
+(raw_signal/                                   Intermediate files during raw signal detection. Removed by default.)
+(poa_workspace/                                Intermediate files during transcript sequence generation with POA. Removed by default.)
+
 
