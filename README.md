@@ -37,7 +37,7 @@ vdjcraft -I input.fastq -R IMGT.fa -O output_folder -of output
 
 V(D)Jcraft is a tool for VDJC identification with long-read transcriptome sequencing data. The input should be sequencing reads file: fastq or fa (PacBio Iso-Seq, Nanopore, or mixed platform). The output is a list of confident VDJC gene list and their
  CDR nt sequences and amino acid sequences. By default, V(D)Jcraft uses Human GRCh38 and IMGT VDJC database.
-#When using custom reference, make sure the chromosome name in BAM, GTF, and reference_genome.fa are identical. By default, FusionSeeker only considers gene with valid "gene_name" in GTF and skips the remaining genes, unless --geneid is set.<br />
+#When using custom reference, make sure the chromosome name in BAM, GTF, and reference_genome.fa are identical. By default, VDJcraft only considers gene with valid "gene_name" in GTF and skips the remaining genes, unless --geneid is set.<br />
 This program was tested on a x86_64 Linux system with a 128GB physical memory.
 
 
@@ -66,7 +66,7 @@ To simplify the environment setup process, Anaconda2 (https://www.anaconda.com/)
 ```
 conda create --name vdjcraft -y
 conda activate vdjcraft
-conda install -c bioconda minimap2=2.24 pysam=0.17 samtools=1.9 -y
+conda install -c bioconda minimap2=2.24 blastn=0.17 samtools=1.9 -y
 
 ```
 
@@ -83,7 +83,7 @@ Output should be identical to confident_vdjc.txt in the testdata folder, with 30
 ```
 VDJcraft [-h] -I <input.fastq>
 
-Gene fusion caller for long-read sequencing data
+V(D)J identifier for long-read sequencing data
 
 optional arguments:
   -h, --help            show this help message and exit
