@@ -126,25 +126,25 @@ VDJcraft -I vdjcraft/testdata/test.fastq  -R vdjcraft/testdata/IMGT.fa -o test_o
 
 
 ### Options of VDJcraft
-#### 1. --minsupp, minimal number of supporting reads
---min_supp is the most important argument for gene fusion candidate filtering of FusionSeeker. It is used to remove false-positive signals generated during sequencing or read alignment processes.
-By default, FusionSeeker estimates the volumn of noise signals from input dataset to assign a resonable --minsupp. If you find number of gene fusions is too few under default settings, you can speficy a lower --minsupp cutoff to allow in more candidates:
+#### 1. -pct, percentage of identification of blast local alignment
+-pct is the most important argument for V, J gene candidate filtering of VDJcraft. It is used to remove false-positive signals generated during candidate reads local alignment processes.
+By default, VDJcraft estimates the volumn of noise signals from input dataset to assign a resonable -pct. If you find number of V, J genes is too few under default settings, you can speficy a lower -pct cutoff to allow in more candidates:
 ```
-vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/ --minsupp 5
+VDJcraft -I isoseq.fastq  -R IMGT.fa -o test_out/ -of test_output -pct 90
 ```
-It is not suggested to set a --minsupp below 3, unless the sequencing depth of input dataset is extremely low.
+It is not suggested to set a -pct below 80, unless the sequencing depth of input dataset is extremely low.
 
-#### 2. --maxdistance, maxminal distance cutoff in density-based spatial clustering of applications with noise
-This option adjusts max distance cutoff used for clustering gene fusion raw signals. By default, FusionSeeker sets 20 for highly accurate reads (IsoSeq) and 40 for noisy reads (Nanopore).
-you can set a larger value of --maxdistance to tolerate more shifts in the breakpoint positions of raw signals:
+#### 2. -dpct, percentage of identification of blast local alignment for D genes specifically
+This option is an argument for D gene candidate filtering of VDJcraft. It is used to remove false-positive signals generated after further extracting D gene candidate reads local alignment processes. By default, VDJcraft sets 95 for highly accurate reads (IsoSeq) and 90 for noisy reads (Nanopore).
+you can set a larger value of -dpct to get more accurate D gene identification:
 
 ```
-vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/ --maxdistance 100
+vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/ -dpct 95
 ```
 
 #### 3. --ref, reference genome
-Input reference genome allows FusionSeeker to align transcript sequences and refine breakpoint positions of confident gene fusion calls. Make sure to provide the same reference file used for read alignment.
-By default, FusionSeeker does NOT refine breakpoint positions when no reference genome is provided.
+Input reference genome allows VDJcraft to align transcript sequences and refine breakpoint positions of confident identification. Make sure to provide the same reference file used for read alignment.
+By default, VDJcraft us Hg38 as human reference genome.
 (minimap2(>=2.24) is required to map transcript sequences to the reference.)
 ```
 vdjcraft --bam isoseq.bam --datatype isoseq -o test_out/  --ref reference.fa
