@@ -66,7 +66,7 @@ To simplify the environment setup process, Anaconda2 (https://www.anaconda.com/)
 ```
 conda create --name vdjcraft -y
 conda activate vdjcraft
-conda install -c bioconda minimap2=2.24 blastn=0.17 samtools=1.9 -y
+conda install -c bioconda minimap2=2.24 blast=2.14.0+ samtools=1.17 -y
 
 ```
 
