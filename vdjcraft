@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Paths to BED files inside your tool folder
-hs38_bed = os.path.join(script_dir, "VDJC_genome_CDSuniq.bed")
+hs38_bed = os.path.join(script_dir, "VDJC_hg38_CDSuniq.bed")
 hs37_bed = os.path.join(script_dir, "hg37_VDJ_CDSgenome.bed")
 Mm_bed = os.path.join(script_dir, "Mm39_VDJ_CDSgenome.bed")
 t2t_bed = os.path.join(script_dir, "T2T_VDJ_CDSgenome.bed")
