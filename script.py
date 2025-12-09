@@ -3,7 +3,6 @@ import re
 import os
 
 
-
 def blastfmt(f,f1):
   with open(f1, 'w') as g:
     out0=('Query'+'\t'+'Gene'+'\t'+'Length'+'\t'+'Score'+'\t'+'Expect'+'\t'+'Identities'+'\t'+'Iden_percentage'+'\t'+'Gaps'+'\t'+'Gap_percentage'+'\t'+'Strand'+'\t'+'querystart'+'\t'+'queryend'+'\t'+'queryseq'+'\t'+'subjectstart'+'\t'+'subjectend'+'\t'+'subjectseq'+'\n')
@@ -15,7 +14,6 @@ def blastfmt(f,f1):
     score = expect = 0
     iden = idenper = gap = gapper = 0
     strand = 0
-    #query='m64039_210630_173216/83953370/ccs'
     query=0
     for line in f:
          match = re.search("Query= .*", line)
@@ -99,4 +97,5 @@ def blastfmt(f,f1):
           out3=(query+'\t'+sname+'\t'+le+'\t'+score+'\t'+expect+'\t'+iden+'\t'+idenper+'\t'+gap+'\t'+gapper+'\t'+strand+'\t'+qstart+"\t"+qend+"\t"+qseq+"\t"+sstart+"\t"+send+"\t"+sseq)
           g.write(out3+'\n')
     g.close()
+
 

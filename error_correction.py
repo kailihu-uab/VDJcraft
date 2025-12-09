@@ -2,17 +2,16 @@ import pandas as pd
 
 
 
-
 def error_correction(df):
     df = df.sort_values(by='position')
 
     
     clusters = []
 
-    # Iterate through cluster by position with a difference range of 100
+    # Iterate through cluster by position with a difference range
     current_cluster = []
     for index, row in df.iterrows():
-        if not current_cluster or abs(row['position'] - current_cluster[-1]['position']) <= 100:
+        if not current_cluster or abs(row['position'] - current_cluster[-1]['position']) <= 50:
             current_cluster.append(row)
         else:
             clusters.append(pd.DataFrame(current_cluster))
