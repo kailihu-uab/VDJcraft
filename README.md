@@ -1,4 +1,4 @@
-# V(D)Jcraft
+# VDJcraft
 
 A V(D)J identifer for long-read transcriptome data.
 
