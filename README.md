@@ -62,18 +62,26 @@ Dependencies for VDJcraft:
 ```
 git clone https://github.com/Kaili-Hu/V(D)Jcraft.git
 ```
-Then, please also add this directory to your PATH:
+
+To simplify the environment setup process, Anaconda3 (https://www.anaconda.com/) is recommended:
+```
+conda create --name vdjcraft python=3 -y
+conda activate vdjcraft
+conda install -c bioconda minimap2 samtools blast -y
+pip install biopython python-Levenshtein
+
+```
+
+After installing dependencies, run commands as below:
+```
+cd VDJcraft/
+chmod +x vdjcraft
+./VDJcraft -h
+```
+
+Then,please also add this directory to your PATH (optional):
 ```
 export PATH=$PWD/VDJcraft/:$PATH
-```
-
-
-To simplify the environment setup process, Anaconda2 (https://www.anaconda.com/) is recommended:
-```
-conda create --name vdjcraft -y
-conda activate vdjcraft
-conda install -c bioconda minimap2=2.24 pysam=0.17 samtools=1.9 -y
-
 ```
 
 A test dataset is available to verify successful installation:
