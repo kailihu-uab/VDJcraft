@@ -1,6 +1,6 @@
 # VDJcraft
 
-A V(D)J identifer for long-read transcriptome data.
+A V(D)J recombination identifer for long-read transcriptome data.
 
 Author: Kaili Hu
 
