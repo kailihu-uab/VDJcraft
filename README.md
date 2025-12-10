@@ -15,15 +15,19 @@ cd VDJcraft/
 chmod +x vdjcraft
 ./VDJcraft -h
 
-To simplify the environment setup process, Anaconda2 (https://www.anaconda.com/) is recommended. To create an environment with conda:
+Install conda:
+To simplify the environment setup process, Anaconda3 (https://www.anaconda.com/) or Miniconda(https://repo.anaconda.com/miniconda/) is recommended.
+
+On HPC/cluster systems if conda module is available:
+module avail
+module load anaconda3
+
+To create an environment with conda:
 conda create --name vdjcraft python=3
 conda activate vdjcraft
-conda install bioconda::minimap2
-conda install bioconda::samtools
-conda install bioconda::blast
+conda install -c bioconda minimap2 samtools blast
+pip install biopython python-Levenshtein
 
-pip3 install biopython
-pip install python-Levenshtein
 
 ./VDJcraft -h
 
@@ -47,10 +51,10 @@ This program was tested on a x86_64 Linux system with a 128GB physical memory.
 
 Dependencies for VDJcraft:
 
-* python3
-* minimap2  (tested with version 2.24)
-* samtools  (tested with version 1.9)
-* blastn
+* python3 (tested with version 3.8.16)
+* minimap2  (tested with version 2.26)
+* samtools  (tested with version 1.17)
+* blastn (tested with version 2.14.0+)
 
 
 ## Installation
