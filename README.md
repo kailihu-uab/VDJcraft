@@ -95,20 +95,21 @@ V(D)J recombination caller for long-read sequencing data
 optional arguments:
     -h, --help            show this help message and exit
     -v, --version         show program's version number and exit
-    -I, Fastq             Input fastq.
-    -bam, input bam       Input bam alignment file
-    -ref, reference       Enter your human reference genome.
-    -O, outfolder         Set output folder.
-    -of, outfile          Output result file.
-    -ont, ONT fq          Enter your input ONT file.
-    -t2t, T2Tbed          If using T2T as human refence genome, has to use this which corresponds to T2T BED file.
-    -hs37, GRCh37         If using GRCh37 as human refence genome, has to use this which corresponds to hg37 BED file.
-    -Mm, mouse-GRCm39     If using GRCm39 as mouse refence genome, has to use this which corresponds to GRCm39 BED file.
-    -p, VJIdent           Enter preferred identifation percentage for VJC genes, default = 90.
-    -pd, DIdent           Enter preferred identifation percentage for D genes, default = 80.
-    -s, score             Enter preferred matching score, default = 300.
-    -shm, SHM             Enter to get novel events due to SHM.
-    -m, SHM cutoff        Enter cutoff of matching rate for SHM, default = 85.
+    -I, --fastq           Input fastq.
+    -bam, --bamin         Input bam alignment file
+    -ref, --ref           Enter your human reference genome.
+    -O, --outs            Set output folder.
+    -of, --outfile        Output result file.
+    -ont, --ontfq         Enter your input ONT file.
+    -t2t, --t2t           If using T2T as human refence genome, has to use this which corresponds to T2T BED file.
+    -hs37, --hs37         If using GRCh37 as human refence genome, has to use this which corresponds to hg37 BED file.
+    -Mm, --Mm             If using GRCm39 as mouse refence genome, has to use this which corresponds to GRCm39 BED file.
+    -p, --VJIdent         Enter preferred identifation percentage for VJC genes, default = 90.
+    -pd, --DIdent         Enter preferred identifation percentage for D genes, default = 80.
+    -s, --score           Enter preferred matching score, default = 300.
+    -shm, --shm           Enter to get novel events due to SHM.
+    -m, --mpct            Enter cutoff of matching rate for SHM, default = 85.
+    -c, --corr            Enter for error correct.
 
 ```
 
