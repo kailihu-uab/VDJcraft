@@ -65,7 +65,7 @@ After conda installed or loaded, run commands as below to load dependencies:
 conda create --name vdjcraft python=3 -y
 conda activate vdjcraft
 conda install -c bioconda minimap2 samtools blast -y
-pip install biopython python-Levenshtein
+pip install biopython python-Levenshtein pandas
 
 ```
 
