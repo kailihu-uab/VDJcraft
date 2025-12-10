@@ -9,7 +9,6 @@ Email: klhu0502@uab.edu
 Draft date: Dec.2rd, 2025
 
 ## Quick Start
-```sh
 git clone git clone https://github.com/kailihu-uab/VDJcraft.git
 cd VDJcraft/
 chmod +x vdjcraft
