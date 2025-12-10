@@ -6,7 +6,7 @@ Author: Kaili Hu
 
 Email: klhu0502@uab.edu
 
-Draft date: Dec.2nd, 2025
+Draft date: Dec. 2nd, 2025
 
 ## Quick Start
 ```
@@ -50,7 +50,7 @@ Dependencies for VDJcraft:
 ## Installation
 
 ```
-git clone https://github.com/Kaili-Hu/V(D)Jcraft.git
+git clone https://github.com/kailihu-uab/VDJcraft.git
 ```
 
 Install conda:
@@ -65,16 +65,16 @@ pip install biopython pandas
 
 ```
 
+Then,please also add this directory to your PATH (optional):
+```
+export PATH=$PWD/VDJcraft/:$PATH
+```
+
 After installing dependencies, run commands as below:
 ```
 cd VDJcraft/
 chmod +x vdjcraft
 ./VDJcraft -h
-```
-
-Then,please also add this directory to your PATH (optional):
-```
-export PATH=$PWD/VDJcraft/:$PATH
 ```
 
 A test dataset is available to verify successful installation:
@@ -88,7 +88,7 @@ Output should be identical to vdjcraft_report.csv in the testdata folder, with 1
 
 
 ```
-./VDJcraft [-h] -I <input.fastq>
+VDJcraft [-h] -I <input.fastq>
 
 V(D)J recombination caller for long-read sequencing data
 
