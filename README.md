@@ -105,10 +105,10 @@ optional arguments:
     -hs37, GRCh37         If using GRCh37 as human refence genome, has to use this which corresponds to hg37 BED file.
     -Mm, mouse-GRCm39     If using GRCm39 as mouse refence genome, has to use this which corresponds to GRCm39 BED file.
     -p, VJIdent           Enter preferred identifation percentage for VJC genes, default = 90.
-    -pd, DIdent           Enter preferred identifation percentage for D genes,default = 80.
-    -s, score             Enter preferred matching score,default = 300.
+    -pd, DIdent           Enter preferred identifation percentage for D genes, default = 80.
+    -s, score             Enter preferred matching score, default = 300.
     -shm, SHM             Enter to get novel events due to SHM.
-    -m, SHM cutoff        Enter cutoff of matching rate for SHM,default = 85.
+    -m, SHM cutoff        Enter cutoff of matching rate for SHM, default = 85.
 
 ```
 
