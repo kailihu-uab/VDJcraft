@@ -10,8 +10,9 @@ Draft date: Dec.2rd, 2025
 
 ## Quick Start
 ```sh
-git clone .git
+git clone git clone https://github.com/kailihu-uab/VDJcraft.git
 cd VDJcraft/
+chmod +x vdjcraft
 ./VDJcraft -h
 
 To simplify the environment setup process, Anaconda2 (https://www.anaconda.com/) is recommended. To create an environment with conda:
