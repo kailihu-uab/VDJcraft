@@ -9,6 +9,7 @@ Email: klhu0502@uab.edu
 Draft date: Dec.2rd, 2025
 
 ## Quick Start
+```
 git clone git clone https://github.com/kailihu-uab/VDJcraft.git
 cd VDJcraft/
 chmod +x vdjcraft
@@ -25,6 +26,7 @@ chmod +x vdjcraft
 
 # VDJcraft discovery with other references
 ./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -O output_folder -of output
+```
 
 ## Description
 
