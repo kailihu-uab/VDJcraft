@@ -117,16 +117,7 @@ optional arguments:
 ```
 
 ## Use cases
-VDJcraft requires a input of sequencing reads (Fasta or Fastq format) or bam file:
-
-```
-# PacBio Iso-Seq
-minimap2 -ax splice:hq reference.fa  isoseq.fastq | samtools sort -o isoseq.bam
-samtools index isoseq.bam
-# Nanopore
-minimap2 -ax splice reference.fa  nanopore.fastq | samtools sort -o nanopore.bam
-samtools index nanopore.bam
-```
+VDJcraft requires an input of sequencing reads (Fasta or Fastq format) or bam file:
 
 VDJcraft can be applied with built-in Human reference genome (hg38) and annotation (Ensembl v104):
 ```
