@@ -6,7 +6,7 @@ Author: Kaili Hu
 
 Email: klhu0502@uab.edu
 
-Draft date: Dec.2rd, 2025
+Draft date: Dec.2nd, 2025
 
 ## Quick Start
 ```
