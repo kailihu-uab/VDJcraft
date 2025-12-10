@@ -10,7 +10,7 @@ Draft date: Dec.2rd, 2025
 
 ## Quick Start
 ```
-git clone git clone https://github.com/kailihu-uab/VDJcraft.git
+git clone https://github.com/kailihu-uab/VDJcraft.git
 cd VDJcraft/
 chmod +x vdjcraft
 ./VDJcraft -h
