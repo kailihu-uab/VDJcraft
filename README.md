@@ -31,7 +31,8 @@ chmod +x vdjcraft
 ## Description
 
 V(D)Jcraft is a tool for VDJC identification with long-read transcriptome sequencing data. The input should be sequencing reads file: fastq or fa (PacBio Iso-Seq, Nanopore, or mixed platform). The output is a list of confident VDJC gene list and their CDR nt sequences and amino acid sequences. By default, V(D)Jcraft uses Human GRCh38 and IMGT VDJC database.
-#When using custom reference, make sure the chromosome name in BAM, and reference_genome.fa are identical. By default, VDJcraft use GRCh38 as reference, please download latest human reference from GENCODE.<br />
+
+When using custom reference, make sure the chromosome name in BAM, and reference_genome.fa are identical. By default, VDJcraft use GRCh38 as reference, please download latest human reference from GENCODE.<br />
 
 This program was tested on a x86_64 Linux system with a 128GB physical memory.
 
