@@ -32,6 +32,7 @@ chmod +x vdjcraft
 
 V(D)Jcraft is a tool for VDJC identification with long-read transcriptome sequencing data. The input should be sequencing reads file: fastq or fa (PacBio Iso-Seq, Nanopore, or mixed platform). The output is a list of confident VDJC gene list and their CDR nt sequences and amino acid sequences. By default, V(D)Jcraft uses Human GRCh38 and IMGT VDJC database.
 #When using custom reference, make sure the chromosome name in BAM, and reference_genome.fa are identical. By default, VDJcraft use GRCh38 as reference, please download latest human reference from GENCODE.<br />
+
 This program was tested on a x86_64 Linux system with a 128GB physical memory.
 
 
@@ -53,12 +54,6 @@ git clone https://github.com/Kaili-Hu/V(D)Jcraft.git
 
 Install conda:
 To simplify the environment setup process, Anaconda3 (https://www.anaconda.com/) or Miniconda(https://repo.anaconda.com/miniconda/) is recommended.
-
-On HPC/cluster systems if conda module is available:
-```
-module avail
-module load anaconda3
-```
 
 After conda installed or loaded, run commands as below to load dependencies:
 ```
@@ -121,16 +116,16 @@ VDJcraft requires an input of sequencing reads (Fasta or Fastq format) or bam fi
 
 VDJcraft can be applied with built-in Human reference genome (hg38) and annotation (Ensembl v104):
 ```
-./VDJcraft -I testdata/test.fastq  -ref human_refence.fa(eg.GRCh38.p14.genome.fa) -o output_folder -of output
+./VDJcraft -I test.fastq  -ref human_refence.fa(eg.GRCh38.p14.genome.fa) -o output_folder -of output
 ```
 Or with custom reference genome and filteration cutoff for VJC and D genes:
 ```
-./VDJcraft -I vdjcraft/testdata/test.fastq -t2t -p 95 -pd 85 -ref T2T.fa -o output_folder -of output
+./VDJcraft -I test.fastq -t2t -p 95 -pd 85 -ref T2T.fa -o output_folder -of output
 ```
 
 VDJcraft can be applied with ONT fastq or fasta file with parameter '-ont':
 ```
-./VDJcraft -ont testdata/ONT.fastq  -ref human_refence.fa(eg.GRCh38.p14.genome.fa) -o output_folder -of output
+./VDJcraft -ont ONT.fastq  -ref human_refence.fa -o output_folder -of output
 ```
 
 ### Options of VDJcraft
