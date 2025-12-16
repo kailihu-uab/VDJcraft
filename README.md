@@ -10,11 +10,6 @@ Draft date: Dec. 2nd, 2025
 
 ## Quick Start
 ```
-git clone https://github.com/kailihu-uab/VDJcraft.git
-cd VDJcraft/
-chmod +x vdjcraft
-./VDJcraft -h
-
 # quick using VDJcraft with fastq
 ./VDJcraft -I input.fastq -ref genome.fa -O output_folder -of output
 
@@ -60,14 +55,8 @@ After conda installed or loaded, run commands as below to load dependencies:
 ```
 conda create --name vdjcraft python=3 -y
 conda activate vdjcraft
-conda install -c bioconda minimap2 samtools blast -y
-pip install biopython pandas
-
-```
-
-Then,please also add this directory to your PATH (optional):
-```
-export PATH=$PWD/VDJcraft/:$PATH
+conda install -c conda-forge -c bioconda samtools blast biopython pandas -y
+conda install -c bioconda minimap2 
 ```
 
 After installing dependencies, run commands as below:
@@ -76,6 +65,12 @@ cd VDJcraft/
 chmod +x vdjcraft
 ./VDJcraft -h
 ```
+
+Then,please also add this directory to your PATH (optional):
+```
+export PATH=$PWD/VDJcraft/:$PATH
+```
+
 
 A test dataset is available to verify successful installation:
 ```
