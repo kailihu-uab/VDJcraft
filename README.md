@@ -11,16 +11,16 @@ Draft date: Dec. 2nd, 2025
 ## Quick Start
 ```
 # quick using VDJcraft with fastq
-./VDJcraft -I input.fastq -ref genome.fa -O output_folder -of output
+./VDJcraft -I input.fastq -ref genome.fa -o output_folder -f output
 
 # VDJcraft discovery with custom parameter
-./VDJcraft -I input.fastq -ref T2T.fa -t2t -p 95 -pd 70 -O output_folder -of output
+./VDJcraft -I input.fastq -ref T2T.fa -t -p 95 -d 70 -o output_folder -f output
 
 # VDJcraft discovery of potential novel events
-./VDJcraft -I test.fastq -shm -ref GRCh38.p14.genome.fa -O output_folder -of output
+./VDJcraft -I test.fastq -h -ref GRCh38.p14.genome.fa -o output_folder -f output
 
 # VDJcraft discovery with other references
-./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -O output_folder -of output
+./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -o output_folder -f output
 ```
 
 ## Description
@@ -126,7 +126,7 @@ VDJcraft can be applied with ONT fastq or fasta file with parameter '-ont':
 ```
 
 ### Options of VDJcraft
-#### 1. -shm, generating events caused by somatic hypermutation(SHM).
+#### 1. -h, generating events caused by somatic hypermutation(SHM).
 --shm is the most essential and biologically meaningful argument for novel candidate of VDJcraft. It is used to generate sequences potentially containning SHM and partially align to IMGT database.
 By default, VDJcraft estimates partially aligning to IMGT cutoff by 85% default, customized by -m. If you find number of novel events is too high under default settings, you can speficy a lower -m cutoff to allow in less candida
 tes:
