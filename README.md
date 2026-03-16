@@ -17,7 +17,7 @@ Draft date: Dec. 2nd, 2025
 ./VDJcraft -I input.fastq -ref T2T.fa -t -p 95 -d 70 -o output_folder -f output
 
 # VDJcraft discovery of potential novel events
-./VDJcraft -I test.fastq -h -ref GRCh38.p14.genome.fa -o output_folder -f output
+./VDJcraft -I test.fastq -n -ref GRCh38.p14.genome.fa -o output_folder -f output
 
 # VDJcraft discovery with other references
 ./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -o output_folder -f output
@@ -102,7 +102,7 @@ optional arguments:
     -p, --VJIdent         Enter preferred identifation percentage for VJC genes, default = 90.
     -d, --DIdent          Enter preferred identifation percentage for D genes, default = 80.
     -s, --score           Enter preferred matching score, default = 300.
-    -h, --shm             Enter to get novel events due to SHM.
+    -n, --shm             Enter to get novel events due to SHM.
     -m, --mpct            Enter cutoff of matching rate for SHM, default = 85.
     -c, --corr            Enter for error correct.
 
@@ -126,18 +126,18 @@ VDJcraft can be applied with ONT fastq or fasta file with parameter '-ont':
 ```
 
 ### Options of VDJcraft
-#### 1. -h, generating events caused by somatic hypermutation(SHM).
+#### 1. -n, generating events caused by somatic hypermutation(SHM).
 --shm is the most essential and biologically meaningful argument for novel candidate of VDJcraft. It is used to generate sequences potentially containning SHM and partially align to IMGT database.
 By default, VDJcraft estimates partially aligning to IMGT cutoff by 85% default, customized by -m. If you find number of novel events is too high under default settings, you can speficy a lower -m cutoff to allow in less candida
 tes:
 ```
-./VDJcraft -I test.fastq -h -m 80 -ref GRCh38.p14.genome.fa -o output_folder -f output
+./VDJcraft -I test.fastq -n -m 80 -ref GRCh38.p14.genome.fa -o output_folder -f output
 ```
 
 #### 2. -ref, reference genome
 Input reference genome allows VDJcraft to align transcript sequences and refine VDJC positions of candidate reads extraction. Make sure to provide the corresponding parameter with same reference file used for read alignment.Default
-lt is GRCh38, custom reference can be: -t2t, T2T ref; -hg37, GRCh37; -Mm, GRCm39.
-This option adjusts different referenct corresponding VDJC position bed files. By default, GRCh38 is applied, custom reference can be: -t2t, T2T ref; -hg37, GRCh37; -Mm, GRCm39
+lt is GRCh38, custom reference can be: -t, T2T ref; -hg37, GRCh37; -M, GRCm39.
+This option adjusts different referenct corresponding VDJC position bed files. By default, GRCh38 is applied, custom reference can be: -t, T2T ref; -hg37, GRCh37; -M, GRCm39
 
 ```
 ./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -o output_folder -f output
