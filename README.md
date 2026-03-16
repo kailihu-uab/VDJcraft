@@ -74,7 +74,7 @@ export PATH=$PWD/VDJcraft/:$PATH
 
 A test dataset is available to verify successful installation:
 ```
-./VDJcraft -I test.fastq -ref GRCh38.p14.genome.fa -O test -of vdjcraft_test
+./VDJcraft -I test.fastq -ref GRCh38.p14.genome.fa -o test -f vdjcraft_test
 ```
 Output should be identical to vdjcraft_report.csv in the testdata folder, with 16 identification.
 (The VDJC identification on test dataset should finish within several minutes with 1 CPUs and 1GB memory.)
