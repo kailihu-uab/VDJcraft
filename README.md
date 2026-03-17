@@ -62,7 +62,7 @@ conda install -c bioconda minimap2
 After installing dependencies, run commands as below:
 ```
 cd VDJcraft/
-chmod +x vdjcraft
+chmod +x VDJcraft
 ./VDJcraft -h
 ```
 
