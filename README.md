@@ -22,6 +22,10 @@ Draft date: Dec. 2nd, 2025
 # VDJcraft discovery with other references
 ./VDJcraft -I test.fastq -hs37 -ref GRCh37.genome.fa -o output_folder -f output
 ```
+## Paper to cite
+```
+Hu,Kaili,et al.(2026) "Comprehensive characterization of V(D)J recombination from long-read transcriptomic data with VDJcraft".MSID#: BIORXIV/2026/715879.doi: https://doi.org/10.64898/2026.04.01.715879
+```
 
 ## Description
 
