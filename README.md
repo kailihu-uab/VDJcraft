@@ -78,7 +78,7 @@ export PATH=$PWD/VDJcraft/:$PATH
 
 A test dataset is available to verify successful installation:
 ```
-./VDJcraft -I test.fastq -ref GRCh38.p14.genome.fa -o test -f vdjcraft_test
+./VDJcraft -I test.fastq -ref GRCh38.p14.genome.fa -o test_output -f vdjcraft_test
 ```
 Output should be identical to vdjcraft_report.csv in the testdata folder, with 16 identification.
 (The VDJC identification on test dataset should finish within several minutes with 1 CPUs and 1GB memory.)
@@ -156,7 +156,7 @@ By default, VDJcraft using latest version updated in 2025 on IMGT is provided.
 
 
 ## Output files
-The output directory includes:
+The output directory includes (test file output results are in test_out folder):
 ```
 vdjcraft_report.csv                     Final report of VDJcraft. A list of confident VDJC identifications from long-read transcriptome data, including count,v_gene,d_gene,j_gene,c_gene,cdr_sequence,aa_sequence
 vdjc_original.txt                       A list of confident VDJ original calls before error correction from input fastq file. Includes gene names, gene sequences, name of VDJC-supporting reads.
