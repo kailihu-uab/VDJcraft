@@ -76,7 +76,7 @@ export PATH=$PWD/VDJcraft/:$PATH
 ```
 
 
-A test dataset is available to verify successful installation:
+A test dataset is available to verify successful installation(GRCh38 reference fasta need to be downloadeded from GENCODE):
 ```
 ./VDJcraft -I test.fastq -ref GRCh38.p14.genome.fa -o test_output -f vdjcraft_test
 ```
