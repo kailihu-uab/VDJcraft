@@ -11,7 +11,7 @@ import script
 #import dscript
 import high_confident
 import D_extract
-import error_correction
+import error_correct
 import io
 import cdr3
 import cdr1_cdr2
@@ -19,26 +19,23 @@ import tempfile
 import subprocess
 import os
 import math
-import novel
+import shm
+import lineage_tree
 #need to install 'pip install biopython' to run import blast
-
-def main():
-    # your existing code here
-    print("VDJcraft is running")
-
-if __name__ == "__main__":
-    main()
-
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Paths to BED files inside your tool folder
-hs38_bed = os.path.join(script_dir, "VDJC_hg38_CDSuniq.bed")
+hs38_bed = os.path.join(script_dir, "VDJC_genome_CDSuniq.bed")
 hs37_bed = os.path.join(script_dir, "hg37_VDJ_CDSgenome.bed")
 Mm_bed = os.path.join(script_dir, "Mm39_VDJ_CDSgenome.bed")
 t2t_bed = os.path.join(script_dir, "T2T_VDJ_CDSgenome.bed")
 CDR2_consensus = os.path.join(script_dir, "CDR2.consensus.csv")
 IMGT_ref = os.path.join(script_dir, "IMGT_ref/IMGT_VJC")
 IMGT_D = os.path.join(script_dir, "IMGT_Dref/IMGT_D.new")
+# IMGT-GAPPED V reference for -n/--shm. The gaps carry IMGT unique numbering, which is
+# what lets each mutation be placed in its FR/CDR region; an ungapped reference still
+# scores mutation load but the region and selection sections are skipped.
+IMGT_gapped = os.path.join(script_dir, "IMGT_gapped")
 
 parser = argparse.ArgumentParser(description="A V(D)J recombination identifer for long-read transcriptome data")
 
@@ -54,28 +51,53 @@ group1.add_argument('-M', '--Mm', action="store_true", help="Use Mm BED file")
 parser.add_argument('-R','--database', type=str, help="Enter your database")
 parser.add_argument('-ref','--ref', type=str, help="Enter your human reference genome")
 parser.add_argument('-o', '--outs', type=str, help="Set output folder",required=True)
-parser.add_argument('-f','--outfile',type=str, help="output result file",required=True)
+parser.add_argument('-f','--outfile',type=str, default='vdjcraft', help="basename for the final report files (default: vdjcraft)")
 parser.add_argument('-p', '--VJIdent', type=int, default = 90, help="Enter preferred identifation percentage for VJ genes")
 parser.add_argument('-d', '--DIdent', type=int, default = 80, help="Enter preferred identifation percentage for D genes")
 parser.add_argument('-s', '--score', type=int, default = 300, help="Enter preferred matching score")
-parser.add_argument('-n', '--shm', action="store_true", help="Enter to get novel events due to SHM")
-parser.add_argument('-m', '--mpct', type=int, default = 85, help="Enter cutoff of matching rate for SHM")
+parser.add_argument('-n', '--shm', action="store_true", help="SHM analysis")
+parser.add_argument('-m', '--mpct', type=int, default = 85, help="cutoff of matching rate for SHM (accepted for backward compatibility; the current SHM module scores against a germline reference instead)")
+parser.add_argument('-g', '--germline', type=str, help="germline V reference (FASTA file or directory) for -n/--shm and -L/--lineage; defaults to the bundled IMGT-gapped V reference")
 parser.add_argument('-r', '--corr', action="store_true",help="Enter to process error correction module")
+parser.add_argument('-L', '--lineage', action="store_true", help="subclone calling and lineage tree per clonotype")
+parser.add_argument('--min-step-mutations', type=int, default=lineage_tree.MIN_STEP_MUTATIONS, help=f"-L: new mutations a subclonotype must add over its parent, otherwise it merges into the parent (default {lineage_tree.MIN_STEP_MUTATIONS})")
+parser.add_argument('--min-mut-reads', type=int, default=lineage_tree.MIN_MUT_READS, help=f"-L: reads that must carry a mutation before it can define a subclonotype (default {lineage_tree.MIN_MUT_READS})")
+parser.add_argument('--min-node-reads', type=int, default=lineage_tree.MIN_NODE_READS, help=f"-L: reads a subclonotype needs to exist (default {lineage_tree.MIN_NODE_READS})")
 
 args = parser.parse_args()
+
+required_tools = ['blastn'] if args.bam else ['minimap2', 'samtools', 'blastn']
+missing_tools = [t for t in required_tools if shutil.which(t) is None]
+if missing_tools:
+    parser.error("required executable(s) not found on PATH: " + ", ".join(missing_tools))
 
 if not args.bam and not args.ref:
     parser.error("You must provide --ref when FASTQ input is used. (--bam does not require reference)")
 
+if args.shm and not args.corr:
+    parser.error("-n/--shm scores mutation per clone, so it needs the corrected table; add -r/--corr")
+
+if args.lineage and not args.corr:
+    parser.error("-L/--lineage builds subclones per clone, so it needs the corrected table; add -r/--corr")
+
 if args.Mm:
     IMGT_ref = os.path.join(script_dir, "Mm_IMGT_ref/Mm_IMGT_VJC")
     IMGT_D = os.path.join(script_dir, "Mm_IMGT_Dref/Mm_IMGT_D")
+    IMGT_gapped = os.path.join(script_dir, "Mm_IMGT_gapped")
 else:
     IMGT_ref = os.path.join(script_dir, "IMGT_ref/IMGT_VJC")
     IMGT_D = os.path.join(script_dir, "IMGT_Dref/IMGT_D.new")
 
+if args.database:
+    # -R takes a blastn database prefix built with
+    # 'makeblastdb -in custom.fa -dbtype nucl -out custom'
+    IMGT_ref = os.path.splitext(args.database)[0] if args.database.endswith('.fa') else args.database
+
+print("VDJcraft is running")
+
 output_folder = args.outs
 if os.path.exists(output_folder):
+    print(f"removing existing output folder {output_folder}")
     shutil.rmtree(output_folder)
 os.makedirs(output_folder)
 def generate_output_file(file_name):
@@ -105,20 +127,16 @@ else:
     samtools_bam_file = os.path.join(temp_dir, 'samtools_output.bam')
     samtools_cmd = ['samtools', 'view', '-b', minimap2_output_file]
     with open(samtools_bam_file, 'wb') as samtools_bam_output:
-        samtools_proc = subprocess.run(samtools_cmd, stdout=samtools_bam_output)    
+        samtools_proc = subprocess.run(samtools_cmd, stdout=samtools_bam_output, check=True)
 
 
 sorted_bam_file = os.path.join(temp_dir, 'sorted_output.bam')
 samtools_cmd_sort = ['samtools', 'sort', samtools_bam_file]
 with open(sorted_bam_file, 'wb') as sorted_bam_output:
-    samtools_proc_sort = subprocess.run(samtools_cmd_sort, stdout=sorted_bam_output)
+    samtools_proc_sort = subprocess.run(samtools_cmd_sort, stdout=sorted_bam_output, check=True)
 
-samtools_index_file = sorted_bam_file + '.bai'
 samtools_cmd_index = ['samtools', 'index', sorted_bam_file]
-samtools_proc_index = subprocess.run(samtools_cmd_index)
-
-index_file_destination = os.path.join(temp_dir, os.path.basename(samtools_index_file))
-shutil.move(samtools_index_file, index_file_destination)
+samtools_proc_index = subprocess.run(samtools_cmd_index, check=True)
 
 if args.t2t:
     bed_file = t2t_bed
@@ -133,10 +151,10 @@ else:
 samtools_vdj_bam = os.path.join(temp_dir, 'samtools_vdj.bam')
 samtools_cmd3 = ['samtools', 'view', '-b', '-L', bed_file, sorted_bam_file]
 with open(samtools_vdj_bam, 'wb') as vdj_bam:
-    samtools_proc_vdj = subprocess.run(samtools_cmd3, stdout=vdj_bam)
+    samtools_proc_vdj = subprocess.run(samtools_cmd3, stdout=vdj_bam, check=True)
 
 samtools_cmd_view = ['samtools', 'view', samtools_vdj_bam]
-samtools_proc_view = subprocess.run(samtools_cmd_view, stdout=subprocess.PIPE)
+samtools_proc_view = subprocess.run(samtools_cmd_view, stdout=subprocess.PIPE, check=True)
 cut_cmd = ['cut', '-f', '1,3,4']
 cut_proc = subprocess.run(cut_cmd, input=samtools_proc_view.stdout, stdout=subprocess.PIPE)
 columns = ['Query', 'chr', 'position']
@@ -202,38 +220,6 @@ remove_empty_fasta(file_path,file_candidate)
 
 shutil.rmtree(temp_dir)
 
-def extract_sequences(fasta_file, queries_df, dseq_file):
-    queries = {}
-    for _, row in queries_df.iterrows():
-        queries[row['Query']] = (row['dstart'], row['dend'])
-    sequences = {}
-    with open(fasta_file, 'r') as infile, open(dseq_file, 'w') as outfile:
-        sequence = ""
-        current_query = ""
-
-        for line in infile:
-            if line.startswith('>'):
-                if current_query in queries:
-                    start, end = queries[current_query]
-                    if not (math.isnan(start) or math.isnan(end)):
-                         start = int(start)
-                         end = int(end)
-                         if start >= 1 and start < end:
-                               outfile.write(f">{current_query}\n{sequence[start-1:end]}\n")
-                current_query = line.strip()[1:]
-                sequence = ""
-            else:
-                sequence += line.strip()
-
-        # Process the last sequence after the loop ends
-        if current_query in queries:
-            start, end = queries[current_query]
-            if not (math.isnan(start) or math.isnan(end)):
-                start = int(start)
-                end = int(end)
-                if start >= 1 and start < end:
-                       outfile.write(f">{current_query}\n{sequence[start-1:end]}\n")
- #   return outfile
 blastout = "blastout.txt"
 file_blast=generate_output_file(blastout)
 if os.path.exists(file_blast):
@@ -263,7 +249,7 @@ vjtemp=generate_output_file(vjfile)
 vgene="vgene.csv"
 vgene_temp=generate_output_file(vgene)
 VJIdent = args.VJIdent
-high_confident.top_extract(raw,add_line,vdjc_out,vjtemp,vgene_temp,VJIdent)
+high_confident.top_extract(raw,add_line,vdjc_out,vjtemp,vgene_temp,VJIdent,args.score)
 
 
 dseq_file ='dgene_candidate.fa'
@@ -314,6 +300,7 @@ with open(vdjc_out,'r') as vjc, open(d_out,'r') as d:
     df_vjc = select_best_vdj(df_vjc, cols)
     merge_vdjc = pd.merge(df_vjc, df_d, on = 'Query', how='left')
     merge_vdjc = merge_vdjc[['v_gene','d_gene','j_gene','c_gene','v_seq','d_seq','j_seq','Query']]
+    merge_vdjc['d_gene'] = merge_vdjc['d_gene'].astype(object)
     merge_vdjc.loc[merge_vdjc['v_gene'].str.contains(r'IGKV|IGLV|TRAV|TRGV', na=False),'d_gene'] = '.'
     merge_vdjc.to_csv(mergevdjc, sep='\t', index=False, na_rep='.')
 
@@ -354,63 +341,55 @@ def add_count_column(df, sort_by_count=True):
     return grouped
 
 
-cdr3_file = "cdr3.csv"
+cdr3_file = "cdr3.tsv"
 cdr3_bed = "cdr3.bed"
 cdr3_temp = generate_output_file(cdr3_file)
 bed_temp = generate_output_file(cdr3_bed)
-cdr3.cdr3_extract(vjtemp, file_path, bed_temp, cdr3_temp)
+cdr3_df = cdr3.cdr3_extract(vjtemp, file_path, bed_temp, cdr3_temp)
+
+cdr_slim = cdr3_df[['Query', 'cdr_ntseq', 'cdr_aa']].rename(
+    columns={'cdr_ntseq': 'cdr_sequence', 'cdr_aa': 'aa_sequence'})
 
 
 
 if args.corr:
-    corr_vdjc = "vdjc_corrected.csv"
-    correct_vdjc = generate_output_file(corr_vdjc)
-    with open(mergevdjc,'r') as vdjc, open(tablefile,'r') as T:
-        df_vdjc = pd.read_csv(vdjc, sep='\t', header=0)
-        df_pos = pd.read_csv(T, sep='\t', header=0)
-        pos_vdjc = pd.merge(df_pos, df_vdjc, on = 'Query', how='right')
-        corrected_df = error_correction.error_correction(pos_vdjc)
-        sorted_df = corrected_df.iloc[1:].sort_values(by=corrected_df.columns[0])
-        cols = ['v_gene', 'd_gene', 'j_gene', 'c_gene']
-        sorted_df = select_best_vdj(sorted_df, cols)
-        sorted_df.to_csv(correct_vdjc, sep='\t', index=False, na_rep='.')
+    corr_input = generate_output_file("vdjc_precorrection.tsv")
+    correct_vdjc = generate_output_file("vdjc_corrected.tsv")
+    df_vdjc = pd.read_csv(mergevdjc, sep='\t', header=0)
+    pos_vdjc = pd.merge(cdr_slim, df_vdjc, on='Query', how='left')
+    pos_vdjc.to_csv(corr_input, sep='\t', index=False, na_rep='.')
 
-    T.close()
-
-
-    vdj_report = "vdjcraft_ident.csv"
-    vdj_clono = "vdjcraft_report.csv"
-    final_vdjc = generate_output_file(vdj_report)
-    final_clono = generate_output_file(vdj_clono)
-    with open(correct_vdjc,'r') as allvdj, open(cdr3_temp,'r') as cdr:
-        df_allvdj = pd.read_csv(allvdj, sep='\t', header=0)
-        df_cdr = pd.read_csv(cdr, sep='\t', header=0)
-        df_final = pd.merge(df_allvdj, df_cdr, on = 'Query', how='left')
-        cols = ['v_gene', 'd_gene', 'j_gene', 'c_gene']
-        df_final = select_best_vdj(df_final, cols)
-        df_final = df_final[['Query', 'v_gene', 'd_gene', 'j_gene', 'c_gene', 'cdr_sequence', 'aa_sequence']]
-        df_final[['cdr_sequence','aa_sequence']] = df_final[['cdr_sequence','aa_sequence']].fillna('out_of_frame')
-        result_df = add_count_column(df_final)
-        df_final.to_csv(final_vdjc, sep='\t', index=False, na_rep='out_of_frame')
-        result_df.to_csv(final_clono, sep='\t', index=False, na_rep='out_of_frame')
-
+    # run_clone_correction reads a TSV path and writes the corrected table,
+    # the clone consensus FASTA and a QC report itself.
+    error_correct.run_clone_correction(
+        corr_input,
+        out_tsv=correct_vdjc,
+        out_fasta=generate_output_file("vdjc_corrected.fa"),
+        out_qc=generate_output_file("vdjc_qc_report.txt"),
+        verbose=False)
+    df_allvdj = pd.read_csv(correct_vdjc, sep='\t', header=0)
 else:
-    vdj_report = "vdjcraft_ident.csv"
-    vdj_clono = "vdjcraft_report.csv"
-    final_vdjc = generate_output_file(vdj_report)
-    final_clono = generate_output_file(vdj_clono)
-    with open(mergevdjc,'r') as allvdj, open(cdr3_temp,'r') as cdr:
-        df_allvdj = pd.read_csv(allvdj, sep='\t', header=0)
-        df_cdr = pd.read_csv(cdr, sep='\t', header=0)
-        df_final = pd.merge(df_allvdj, df_cdr, on = 'Query', how='left')
-        cols = ['v_gene', 'd_gene', 'j_gene', 'c_gene']
-        df_final = select_best_vdj(df_final, cols)
-        df_final = df_final[['Query', 'v_gene', 'd_gene', 'j_gene', 'c_gene', 'cdr_sequence', 'aa_sequence']]
-        df_final[['cdr_sequence','aa_sequence']] = df_final[['cdr_sequence','aa_sequence']].fillna('out_of_frame')
-        result_df = add_count_column(df_final)
-        df_final.to_csv(final_vdjc, sep='\t', index=False, na_rep='out_of_frame')
-        result_df.to_csv(final_clono, sep='\t', index=False, na_rep='out_of_frame')
-        
+    correct_vdjc = None
+    df_allvdj = pd.merge(pd.read_csv(mergevdjc, sep='\t', header=0),
+                         cdr_slim, on='Query', how='left')
+
+
+vdj_report = args.outfile + "_ident.tsv"
+vdj_clono = args.outfile + "_report.tsv"
+final_vdjc = generate_output_file(vdj_report)
+final_clono = generate_output_file(vdj_clono)
+cols = ['v_gene', 'd_gene', 'j_gene', 'c_gene']
+df_final = select_best_vdj(df_allvdj, cols)
+df_final = df_final[['Query', 'v_gene', 'd_gene', 'j_gene', 'c_gene', 'cdr_sequence','aa_sequence']]
+# Replace "_" with "*" in all gene names
+gene_cols = ['v_gene', 'd_gene', 'j_gene']
+df_final[gene_cols] = df_final[gene_cols].apply(
+    lambda col: col.str.replace('_', '*', regex=False))
+df_final[['cdr_sequence','aa_sequence']] = df_final[['cdr_sequence','aa_sequence']].fillna('out_of_frame')
+result_df = add_count_column(df_final)
+df_final.to_csv(final_vdjc, sep='\t', index=False, na_rep='out_of_frame')
+result_df.to_csv(final_clono, sep='\t', index=False, na_rep='out_of_frame')
+
 
 cdr1 = "cdr1.csv"
 cdr1_temp = generate_output_file(cdr1)
@@ -436,34 +415,52 @@ with open(vgene_temp,'r') as cd:
 
 
 #Add function for potential novel events for Somatic hypermutation.
-def SHM_event(df, sort_by_count=True):
-    cols = ['Gene', 'queryseq']
+#def SHM_event(df, sort_by_count=True):
+#    cols = ['Gene', 'queryseq']
 
-    grouped = df.groupby(cols).size().reset_index(name='count')
+#    grouped = df.groupby(cols).size().reset_index(name='count')
 
-    reordered_cols = ['count'] + cols
-    grouped = grouped[reordered_cols]
+#    reordered_cols = ['count'] + cols
+#    grouped = grouped[reordered_cols]
 
-    if sort_by_count:
-        grouped = grouped.sort_values(by='count', ascending=False).reset_index(drop=True)
+#    if sort_by_count:
+#        grouped = grouped.sort_values(by='count', ascending=False).reset_index(drop=True)
 
-    return grouped
+#    return grouped
 
 
+
+if args.shm or args.lineage:
+    germline = args.germline or (IMGT_gapped if os.path.isdir(IMGT_gapped)
+                                 else IMGT_ref + ".fa")
+    if not args.germline and not os.path.isdir(IMGT_gapped):
+        print(f"note: {IMGT_gapped} not found; using the ungapped reference, so the "
+              f"FR/CDR region analysis will be skipped")
 
 if args.shm:
-    output_vj = 'output_vj.txt'
-    vj = generate_output_file(output_vj)
-    novel_temp = "novel.csv"
-    shm_temp = generate_output_file(novel_temp)
-    novel.top_extract(raw, vj)
-    with open(vj,'r') as vj_temp:
-        df_shm = pd.read_csv(vj_temp, sep='\t', header=0)
-        df_shm = df_shm[['Query', 'Gene','Iden_percentage','queryseq']]
-        df_shm['Iden_percentage_float'] = df_shm['Iden_percentage'].str.rstrip('%').astype(float)
-        filtered_df_shm = df_shm[df_shm['Iden_percentage_float'] < args.mpct]
-        df_shm_select = filtered_df_shm[['Gene','queryseq']]
-        result_shm = SHM_event(df_shm_select)
-        result_shm.to_csv(shm_temp, sep='\t', index=False, na_rep='out_of_frame')
+    try:
+        shm.run_shm_analysis(correct_vdjc,
+                             germline=germline,
+                             out_report=generate_output_file("shm_report.txt"),
+                             out_tsv=generate_output_file("shm_per_clone.tsv"),
+                             verbose=False)
+    except SystemExit as e:
+        print(f"SHM analysis skipped: {e}")
 
+if args.lineage:
+    # writes <outfile>.lineage_nodes.tsv, .lineage_edges.tsv, .lineage.newick,
+    # .lineage_sequences.fasta, .subclones_tree.tsv and, when Rscript and the R packages
+    # are available, .lineage_trees.pdf (the 20 largest multi-subclone trees, drawn by the
+    # bundled plot_lineage.R) into the output folder
+    try:
+        lineage_tree.run_subclone_tree(correct_vdjc,
+                                       germline=germline,
+                                       out_prefix=generate_output_file(args.outfile),
+                                       min_step=args.min_step_mutations,
+                                       min_mut_reads=args.min_mut_reads,
+                                       min_node_reads=args.min_node_reads,
+                                       verbose=False)
+    except SystemExit as e:
+        print(f"lineage tree skipped: {e}")
 
+print(f"VDJcraft finished; results in {output_folder}")
